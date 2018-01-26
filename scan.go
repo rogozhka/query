@@ -1,76 +1,66 @@
+//
+// query is a tiny package for executing select-like queries and converting sql.Rows into slice of map[string]string
+// The new map[string]string is allocated for each row. Keys are column names as seen in sql.
+//
 package query
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 //
-// columns object represents query result headers
-// and provides place where to extract sql.Row data
+// Row represents single line of database result
 //
-type columns struct {
+// Note: when you pass a map "by value"
+// actually you pass a pointer to map struct
+//
+type Row map[string]string
 
-	//
-	// column data receiver
-	// as array of *sql.RawBytes
-	//
-	columnPointers []interface{}
-
-	//
-	// Number of columns in sql result
-	//
-	colCount int
-
-	//
-	// Column names used as row's keys
-	//
-	colNames []string
+//
+// Scan converts already executed query result
+// into a slice of Row with keys as a column names
+//
+func Scan(dbRows *sql.Rows) ([]Row, error) {
+	return ScanLimited(dbRows, 0)
 }
 
 //
-// newScanColumns returns initialized columns entity
-// for one single query
+// Scan converts already executed query result
+// into a slice of Row with keys as a column names;
+// no more than rowsLimit elements
+// OR unlimited if 0
 //
-func newScanColumns(colNames []string) *columns {
-	namesNum := len(colNames)
+func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]Row, error) {
 
-	res := &columns{
-		columnPointers: make([]interface{}, namesNum),
-		colCount:       namesNum,
-		colNames:       colNames,
-	}
-	for i := 0; i < res.colCount; i++ {
-		res.columnPointers[i] = new(sql.RawBytes)
-	}
+	var arrRes []Row
 
-	return res
-}
-
-//
-// getRow extracts map[string]string known as Row
-// from query result known as sql.Rows
-//
-func (p *columns) getRow(rows *sql.Rows) (Row, error) {
-
-	//
-	// Every new row should allocate it's own map
-	//
-	row := make(map[string]string, p.colCount)
-
-	if err := rows.Scan(p.columnPointers...); err != nil {
+	columnNames, err := dbRows.Columns()
+	if err != nil {
 		return nil, err
 	}
 
-	for i := 0; i < p.colCount; i++ {
+	sc := newScanColumns(columnNames)
 
-		if rb, ok := p.columnPointers[i].(*sql.RawBytes); ok {
+	i := uint64(0)
 
-			row[p.colNames[i]] = string(*rb)
-
-		} else {
-			return nil, fmt.Errorf("Cannot convert index %d column %p to type *sql.RawBytes", i, p.colNames[i])
+	for dbRows.Next() {
+		if rowsLimit > 0 && i >= rowsLimit {
+			break
 		}
+
+		row, err := sc.getRow(dbRows)
+		if err != nil {
+			return nil, err
+		}
+
+		//
+		// Pointer to map is appended
+		// to the res. slice;
+		// next getRow will allocate new map
+		//
+		arrRes = append(arrRes, row)
+		i++
 	}
-	return row, nil
+
+	return arrRes, nil
 }
