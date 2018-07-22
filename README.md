@@ -20,7 +20,6 @@ import (
 	"github.com/rogozhka/query"
 
 	"database/sql"
-	"query"
 	"fmt"
 	"log"
 	
