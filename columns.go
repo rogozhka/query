@@ -7,7 +7,7 @@ import (
 
 //
 // columns object represents query result headers
-// and provides place where to extract sql.Row data
+// and provides place to extract sql.Row data
 //
 type columns struct {
 
@@ -69,7 +69,7 @@ func (p *columns) getRow(rows *sql.Rows) (Row, error) {
 			row[p.colNames[i]] = string(*rb)
 
 		} else {
-			return nil, fmt.Errorf("Cannot convert index %d column %p to type *sql.RawBytes", i, p.colNames[i])
+			return nil, fmt.Errorf("cannot convert index %d column %v to type *sql.RawBytes", i, p.colNames[i])
 		}
 	}
 	return row, nil

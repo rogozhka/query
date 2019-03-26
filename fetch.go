@@ -23,17 +23,17 @@ func Fetch(strQuery string, db *sql.DB) ([]Row, error) {
 //
 func FetchLimited(strQuery string, rowsLimit uint64, db *sql.DB) ([]Row, error) {
 
-	dbRows, err := db.Query(strQuery)
+	rows, err := db.Query(strQuery)
 	if err != nil {
 		return nil, err
 	}
-	if dbRows == nil {
+	if rows == nil {
 		// cannot defer potentially nil.Close()
-		return nil, fmt.Errorf("Query reutrned nil *Rows:%s", strQuery)
+		return nil, fmt.Errorf("nil Query result | %s", strQuery)
 	}
-	defer dbRows.Close()
+	defer rows.Close()
 
-	return ScanLimited(dbRows, rowsLimit)
+	return ScanLimited(rows, rowsLimit)
 }
 
 //
