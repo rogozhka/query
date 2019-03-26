@@ -25,7 +25,7 @@ func Scan(dbRows *sql.Rows) ([]Row, error) {
 }
 
 //
-// Scan converts already executed query result
+// ScanLimited converts already executed query result
 // into a slice of Row with keys as a column names;
 // no more than rowsLimit elements
 // OR unlimited if 0

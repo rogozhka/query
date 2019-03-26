@@ -4,6 +4,12 @@
 
 ## Install
 
+Use go modules and just
+```
+import "github.com/rogozhka/query"
+``` 
+
+or 
 
 ```bash
 go get -u github.com/rogozhka/query
