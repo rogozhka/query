@@ -10,19 +10,19 @@ func NewQueryWrap(db *sql.DB) *queryWrap {
 	return &queryWrap{db: db}
 }
 
-func (p *queryWrap) FetchLimited(strQuery string, rowsLimit uint64) ([]Row, error) {
+func (p *queryWrap) FetchLimited(strQuery string, rowsLimit uint64) ([]map[string]string, error) {
 	return FetchLimited(strQuery, rowsLimit, p.db)
 }
 
-func (p *queryWrap) Fetch(strQuery string) ([]Row, error) {
+func (p *queryWrap) Fetch(strQuery string) ([]map[string]string, error) {
 	return p.FetchLimited(strQuery, 0)
 }
 
-func (p *queryWrap) Select(strQuery string) ([]Row, error) {
+func (p *queryWrap) Select(strQuery string) ([]map[string]string, error) {
 	return p.Fetch(strQuery)
 }
 
-func (p *queryWrap) SelectLimited(strQuery string, rowsLimit uint64) ([]Row, error) {
+func (p *queryWrap) SelectLimited(strQuery string, rowsLimit uint64) ([]map[string]string, error) {
 	return p.FetchLimited(strQuery, rowsLimit)
 }
 
