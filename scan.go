@@ -6,15 +6,9 @@ import (
 	"database/sql"
 )
 
-// Row represents single line of database result.
-//
-// Note: when you pass a map "by value"
-// actually you pass a pointer to map struct
-type Row map[string]string
-
 // Scan converts already executed query result
 // into a slice of Row with keys as a column names.
-func Scan(dbRows *sql.Rows) ([]Row, error) {
+func Scan(dbRows *sql.Rows) ([]map[string]string, error) {
 	return ScanLimited(dbRows, 0)
 }
 
@@ -22,9 +16,9 @@ func Scan(dbRows *sql.Rows) ([]Row, error) {
 // into a slice of Row with keys as a column names;
 // no more than rowsLimit elements
 // OR unlimited if 0.
-func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]Row, error) {
+func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]map[string]string, error) {
 
-	var arrRes []Row
+	var arrRes []map[string]string
 
 	columnNames, err := dbRows.Columns()
 	if err != nil {

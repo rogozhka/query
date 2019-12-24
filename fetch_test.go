@@ -25,7 +25,7 @@ func TestFetch(t *testing.T) {
 		"test_number":    true,
 	}
 
-	checkKeysMatch(t, &reqColumns, &first)
+	checkKeysMatch(t, &reqColumns, first)
 
 	assert.Equal(t, "cron", rows[0]["test_uid"], "0:test_uid")
 	assert.Equal(t, "memset", rows[1]["test_uid"], "1:test_uid")
@@ -58,7 +58,7 @@ func TestFetchLimited(t *testing.T) {
 		"test_number":    true,
 	}
 
-	checkKeysMatch(t, &reqColumns, &first)
+	checkKeysMatch(t, &reqColumns, first)
 
 	assert.Equal(t, "cron", rows[0]["test_uid"], "0:test_uid")
 	assert.Equal(t, "memset", rows[1]["test_uid"], "1:test_uid")
@@ -71,10 +71,10 @@ func TestFetchLimited(t *testing.T) {
 
 }
 
-func checkKeysMatch(t *testing.T, reqColumns *map[string]bool, actual *Row) {
+func checkKeysMatch(t *testing.T, reqColumns *map[string]bool, actual map[string]string) {
 
 	for key, _ := range *reqColumns {
-		_, is := (*actual)[key]
+		_, is := actual[key]
 
 		assert.True(t, is, fmt.Sprintf("Key present:%s", key))
 	}

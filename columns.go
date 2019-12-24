@@ -45,7 +45,7 @@ func newScanColumns(colNames []string) *columns {
 
 // getRow extracts map[string]string known as Row
 // from query result known as sql.Rows.
-func (p *columns) getRow(rows *sql.Rows) (Row, error) {
+func (p *columns) getRow(rows *sql.Rows) (map[string]string, error) {
 
 	// Every new row should allocate it's own map
 	row := make(map[string]string, p.colCount)
