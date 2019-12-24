@@ -5,10 +5,8 @@ import (
 	"fmt"
 )
 
-//
 // columns object represents query result headers
-// and provides place to extract sql.Row data
-//
+// and provides place to extract sql.Row data.
 type columns struct {
 
 	//
@@ -28,10 +26,8 @@ type columns struct {
 	colNames []string
 }
 
-//
 // newScanColumns returns initialized columns entity
-// for one single query
-//
+// for one single query.
 func newScanColumns(colNames []string) *columns {
 	namesNum := len(colNames)
 
@@ -47,15 +43,11 @@ func newScanColumns(colNames []string) *columns {
 	return res
 }
 
-//
 // getRow extracts map[string]string known as Row
-// from query result known as sql.Rows
-//
+// from query result known as sql.Rows.
 func (p *columns) getRow(rows *sql.Rows) (Row, error) {
 
-	//
 	// Every new row should allocate it's own map
-	//
 	row := make(map[string]string, p.colCount)
 
 	if err := rows.Scan(p.columnPointers...); err != nil {
@@ -63,13 +55,10 @@ func (p *columns) getRow(rows *sql.Rows) (Row, error) {
 	}
 
 	for i := 0; i < p.colCount; i++ {
-
 		if rb, ok := p.columnPointers[i].(*sql.RawBytes); ok {
-
 			row[p.colNames[i]] = string(*rb)
-
 		} else {
-			return nil, fmt.Errorf("cannot convert index %d column %v to type *sql.RawBytes", i, p.colNames[i])
+			return nil, fmt.Errorf("cannot convert index %d column %v to *sql.RawBytes", i, p.colNames[i])
 		}
 	}
 	return row, nil
