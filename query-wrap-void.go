@@ -5,6 +5,7 @@ import "database/sql"
 type queryWrapVoid struct {
 }
 
+// NewQueryWrapVoid created noop wrapper for testing.
 func NewQueryWrapVoid(db *sql.DB) *queryWrapVoid {
 	return &queryWrapVoid{}
 }

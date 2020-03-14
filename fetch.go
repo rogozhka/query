@@ -24,8 +24,7 @@ func FetchLimited(strQuery string, rowsLimit uint64, db *sql.DB) ([]map[string]s
 		return nil, err
 	}
 	if rows == nil {
-		// cannot defer potentially nil.Close()
-		return nil, fmt.Errorf("nil Query result | %s", strQuery)
+		return nil, fmt.Errorf("%w | %s", NilResult, strQuery)
 	}
 	defer rows.Close()
 

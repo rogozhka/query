@@ -2,27 +2,25 @@ package query
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 )
+
+var CannotConverError = errors.New("cannot convert")
+var NilResult = errors.New("nil result")
 
 // columns object represents query result headers
 // and provides place to extract sql.Row data.
 type columns struct {
 
-	//
-	// column data receiver
+	// columnPointers is column data receiver
 	// as array of *sql.RawBytes
-	//
 	columnPointers []interface{}
 
-	//
-	// Number of columns in sql result
-	//
+	// colCount is number of columns in sql result.
 	colCount int
 
-	//
-	// Column names used as row's keys
-	//
+	// colNames used as row's keys.
 	colNames []string
 }
 
@@ -47,7 +45,7 @@ func newScanColumns(colNames []string) *columns {
 // from query result known as sql.Rows.
 func (p *columns) getRow(rows *sql.Rows) (map[string]string, error) {
 
-	// Every new row should allocate it's own map
+	// every new row should allocate it's own map
 	row := make(map[string]string, p.colCount)
 
 	if err := rows.Scan(p.columnPointers...); err != nil {
@@ -58,7 +56,7 @@ func (p *columns) getRow(rows *sql.Rows) (map[string]string, error) {
 		if rb, ok := p.columnPointers[i].(*sql.RawBytes); ok {
 			row[p.colNames[i]] = string(*rb)
 		} else {
-			return nil, fmt.Errorf("cannot convert index %d column %v to *sql.RawBytes", i, p.colNames[i])
+			return nil, fmt.Errorf("%w | %d | %v", CannotConverError, i, p.colNames[i])
 		}
 	}
 	return row, nil
