@@ -6,8 +6,8 @@ import (
 	"fmt"
 )
 
-var CannotConverError = errors.New("cannot convert")
-var NilResult = errors.New("nil result")
+var ErrConvertion = errors.New("cannot convert")
+var ErrResult = errors.New("result")
 
 // columns object represents query result headers
 // and provides place to extract sql.Row data.
@@ -47,16 +47,14 @@ func (p *columns) getRow(rows *sql.Rows) (map[string]string, error) {
 
 	// every new row should allocate it's own map
 	row := make(map[string]string, p.colCount)
-
 	if err := rows.Scan(p.columnPointers...); err != nil {
 		return nil, err
 	}
-
 	for i := 0; i < p.colCount; i++ {
 		if rb, ok := p.columnPointers[i].(*sql.RawBytes); ok {
 			row[p.colNames[i]] = string(*rb)
 		} else {
-			return nil, fmt.Errorf("%w | %d | %v", CannotConverError, i, p.colNames[i])
+			return nil, fmt.Errorf("%w | %d | %v", ErrConvertion, i, p.colNames[i])
 		}
 	}
 	return row, nil
