@@ -40,6 +40,9 @@ func Select(strQuery string, db *sql.DB) ([]map[string]string, error) {
 // with keys as a column names; no more than rowsLimit elements
 // OR unlimited if 0.
 func FetchLimitedContext(ctx context.Context, query string, maxRows uint64, db *sql.DB) ([]map[string]string, error) {
+	if nil == ctx {
+		ctx = context.Background()
+	}
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
