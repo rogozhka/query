@@ -28,7 +28,6 @@ type columns struct {
 // for one single query.
 func newScanColumns(colNames []string) *columns {
 	namesNum := len(colNames)
-
 	res := &columns{
 		columnPointers: make([]interface{}, namesNum),
 		colCount:       namesNum,
@@ -37,7 +36,6 @@ func newScanColumns(colNames []string) *columns {
 	for i := 0; i < res.colCount; i++ {
 		res.columnPointers[i] = new(sql.RawBytes)
 	}
-
 	return res
 }
 

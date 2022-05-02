@@ -18,7 +18,7 @@ func Scan(dbRows *sql.Rows) ([]map[string]string, error) {
 // OR unlimited if 0.
 func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]map[string]string, error) {
 
-	var arrRes []map[string]string
+	arrRes := []map[string]string{}
 
 	columnNames, err := dbRows.Columns()
 	if err != nil {
@@ -26,25 +26,20 @@ func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]map[string]string, error
 	}
 
 	sc := newScanColumns(columnNames)
-
 	i := uint64(0)
-
 	for dbRows.Next() {
 		if rowsLimit > 0 && i >= rowsLimit {
 			break
 		}
-
 		row, err := sc.getRow(dbRows)
 		if err != nil {
 			return nil, err
 		}
-
 		// Pointer to map is appended
 		// to the res. slice;
 		// next getRow will allocate new map
 		arrRes = append(arrRes, row)
 		i++
 	}
-
 	return arrRes, nil
 }
