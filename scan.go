@@ -3,48 +3,59 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 )
 
 // Scan converts already executed query result
 // into a slice of Row with keys as a column names.
-func Scan(dbRows *sql.Rows) ([]map[string]string, error) {
-	return ScanLimited(dbRows, 0)
+func Scan(rows *sql.Rows) ([]map[string]string, error) {
+	return ScanLimited(rows, 0)
+}
+
+func ScanContext(ctx context.Context, rows *sql.Rows) ([]map[string]string, error) {
+	return ScanLimitedContext(ctx, rows, 0)
 }
 
 // ScanLimited converts already executed query result
 // into a slice of Row with keys as a column names;
 // no more than rowsLimit elements
 // OR unlimited if 0.
-func ScanLimited(dbRows *sql.Rows, rowsLimit uint64) ([]map[string]string, error) {
+func ScanLimited(rows *sql.Rows, rowsLimit uint64) ([]map[string]string, error) {
+	return ScanLimitedContext(context.Background(), rows, rowsLimit)
+}
 
-	var arrRes []map[string]string
+// ScanLimited converts already executed query result
+// into a slice of Row with keys as a column names;
+// no more than rowsLimit elements
+// OR unlimited if 0.
+func ScanLimitedContext(ctx context.Context, dbRows *sql.Rows, rowsLimit uint64) ([]map[string]string, error) {
 
+	arrRes := []map[string]string{}
 	columnNames, err := dbRows.Columns()
 	if err != nil {
 		return nil, err
 	}
-
 	sc := newScanColumns(columnNames)
-
 	i := uint64(0)
-
 	for dbRows.Next() {
 		if rowsLimit > 0 && i >= rowsLimit {
 			break
 		}
-
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+		}
 		row, err := sc.getRow(dbRows)
 		if err != nil {
 			return nil, err
 		}
-
 		// Pointer to map is appended
 		// to the res. slice;
 		// next getRow will allocate new map
 		arrRes = append(arrRes, row)
 		i++
 	}
-
 	return arrRes, nil
 }
