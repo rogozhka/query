@@ -1,6 +1,9 @@
 package query
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 type queryWrapVoid struct {
 }
@@ -22,6 +25,33 @@ func (p *queryWrapVoid) SelectLimited(strQuery string, rowsLimit uint64) ([]map[
 	return p.FetchLimited(strQuery, rowsLimit)
 }
 func (p *queryWrapVoid) Exec(strQuery string, args ...interface{}) (sql.Result, error) {
+	return &sqlResult{}, nil
+}
+
+func (p *queryWrapVoid) FetchLimitedContext(ctx context.Context,
+	query string,
+	rowsLimit uint64,
+) ([]map[string]string, error) {
+	return []map[string]string{}, nil
+}
+func (p *queryWrapVoid) FetchContext(ctx context.Context, query string) ([]map[string]string, error) {
+	return p.FetchLimitedContext(ctx, query, 0)
+}
+func (p *queryWrapVoid) SelectContext(ctx context.Context, query string) ([]map[string]string, error) {
+	return p.FetchLimitedContext(ctx, query, 0)
+}
+func (p *queryWrapVoid) SelectLimitedContext(
+	ctx context.Context,
+	query string,
+	rowsLimit uint64,
+) ([]map[string]string, error) {
+	return p.FetchLimitedContext(ctx, query, rowsLimit)
+}
+func (p *queryWrapVoid) ExecContext(
+	ctx context.Context,
+	query string,
+	args ...interface{},
+) (sql.Result, error) {
 	return &sqlResult{}, nil
 }
 
