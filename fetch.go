@@ -14,7 +14,7 @@ func Fetch(strQuery string, db *sql.DB) ([]map[string]string, error) {
 	return FetchLimited(strQuery, 0, db)
 }
 
-// Fetch is used to execute sql
+// FetchContext is used to execute sql
 // and convert expected rows
 // to slice of map[string]string
 // with keys as a column names.
@@ -35,12 +35,12 @@ func Select(strQuery string, db *sql.DB) ([]map[string]string, error) {
 	return Fetch(strQuery, db)
 }
 
-// FetchLimited is used to execute sql query
+// FetchLimitedContext is used to execute sql query
 // and convert expected rows to array of map[string]string
 // with keys as a column names; no more than rowsLimit elements
 // OR unlimited if 0.
 func FetchLimitedContext(ctx context.Context, query string, maxRows uint64, db *sql.DB) ([]map[string]string, error) {
-	if nil == ctx {
+	if ctx == nil {
 		ctx = context.Background()
 	}
 	rows, err := db.QueryContext(ctx, query)

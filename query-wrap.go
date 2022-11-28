@@ -50,7 +50,7 @@ func (p *queryWrap) SelectLimitedContext(ctx context.Context, strQuery string, r
 }
 
 func (p *queryWrap) ExecContext(ctx context.Context, strQuery string, args ...interface{}) (sql.Result, error) {
-	if nil == ctx {
+	if ctx == nil {
 		ctx = context.Background()
 	}
 	return p.db.ExecContext(ctx, strQuery, args...)
